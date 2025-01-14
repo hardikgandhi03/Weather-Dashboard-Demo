@@ -15,7 +15,10 @@ class WeatherDashboard:
         base_name = os.getenv('AWS_BUCKET_NAME', 'weather-dashboard-demo')
         random_suffix = str(uuid.uuid4())[:8]
         self.bucket_name = f"{base_name}-{random_suffix}".lower()
-        self.s3_client = boto3.client('s3')
+        self.s3_client = boto3.client('s3',
+                                      aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                                      aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+                                      region_name=os.getenv('AWS_DEFAULT_REGION'))
 
     def create_bucket_if_not_exists(self):
         """Create S3 bucket if it doesn't exist"""
@@ -76,7 +79,9 @@ def main():
     # Create bucket if needed
     dashboard.create_bucket_if_not_exists()
     
-    cities = ["Ottawa", "Toronto", "Ahmedabad"]
+    with open ('data/cities,json') as file_input:
+        data = json.load(file_input)
+        cities = data['cities']
     
     for city in cities:
         print(f"\nFetching weather for {city}...")
